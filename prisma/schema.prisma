@@ -1,0 +1,367 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  coverImage  String?  // URL de imagen de portada
+  coverVideo  String?  // URL de video de portada (YouTube ID)
+  mediaType   String   @default("image") // "image" o "video"
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  // SEO Fields
+  seoTitle       String?  // Meta title (max 60 chars)
+  seoDescription String?  // Meta description (max 160 chars)
+  seoKeywords    String?  // Keywords separados por comas
+  ogImage        String?  // Open Graph image URL (1200x630)
+  canonicalUrl   String?  // Canonical URL si el contenido está duplicado
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String   // Nombre interno de la campaña
+  utm_campaign String  @unique // Valor para utm_campaign
+  utm_source   String  // Valor para utm_source (ej: facebook, google, email)
+  utm_medium   String  // Valor para utm_medium (ej: cpc, banner, newsletter)
+  utm_term     String? // Valor para utm_term (opcional, keywords)
+  utm_content  String? // Valor para utm_content (opcional, variant)
+  active       Boolean @default(true)
+  startDate    DateTime?
+  endDate      DateTime?
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// 1. Hero Section
+model HeroSection {
+  id          String @id @default(cuid())
+  videoUrl    String
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  buttons     HeroButton[]
+}
+
+model HeroButton {
+  id        String @id @default(cuid())
+  label     String
+  url       String
+  order     Int
+  heroId    String
+  hero      HeroSection @relation(fields: [heroId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 2. Statement Section (Simplicity is the ultimate technology)
+model StatementSection {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  videoUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       StatementItem[]
+}
+
+model StatementItem {
+  id          String @id @default(cuid())
+  icon        String // SVG path or icon name
+  title       String
+  description String
+  order       Int
+  color       String
+  statementId String
+  statement   StatementSection @relation(fields: [statementId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 3. Timeline (Our Journey)
+model TimelineItem {
+  id          String @id @default(cuid())
+  year        String
+  title       String
+  description String
+  color       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 4. Capabilities Section
+model CapabilitiesSection {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       CapabilityItem[]
+}
+
+model CapabilityItem {
+  id              String @id @default(cuid())
+  icon            String
+  title           String
+  description     String
+  color           String
+  order           Int
+  capabilitiesId  String
+  capabilities    CapabilitiesSection @relation(fields: [capabilitiesId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 5. Principles Section
+model PrinciplesSection {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       PrincipleItem[]
+}
+
+model PrincipleItem {
+  id            String @id @default(cuid())
+  icon          String
+  title         String
+  description   String
+  color         String
+  order         Int
+  principlesId  String
+  principles    PrinciplesSection @relation(fields: [principlesId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 6. Impact Section
+model ImpactSection {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       ImpactItem[]
+}
+
+model ImpactItem {
+  id          String @id @default(cuid())
+  icon        String
+  number      String
+  label       String
+  color       String
+  order       Int
+  impactId    String
+  impact      ImpactSection @relation(fields: [impactId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 7. Team Section
+model TeamSection {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  members     TeamMember[]
+}
+
+model TeamMember {
+  id          String @id @default(cuid())
+  name        String
+  role        String
+  bio         String
+  photo       String
+  color       String
+  order       Int
+  teamId      String
+  team        TeamSection @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 8. Contact Section
+model ContactSection {
+  id          String @id @default(cuid())
+  mainTitle   String
+  mainDesc    String
+  formTitle   String
+  formDesc    String
+  emailTo     String // Email donde se reenvían los contactos
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 8.1 Clients Section (Our Clients)
+model ClientsSection {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  clients     ClientLogo[]
+}
+
+model ClientLogo {
+  id         String   @id @default(cuid())
+  name       String
+  logoUrl    String   // Ruta o URL del PNG
+  order      Int      @default(0)
+  published  Boolean  @default(true)
+  tint       String?
+  sectionId  String
+  section    ClientsSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// 9. Contact Form Submissions
+model ContactSubmission {
+  id           String @id @default(cuid())
+  name         String
+  company      String?
+  email        String
+  message      String
+  status       SubmissionStatus @default(NEW)
+  notes        String?
+  // Campos UTM para identificar la campaña
+  utm_campaign String?
+  utm_source   String?
+  utm_medium   String?
+  utm_term     String?
+  utm_content  String?
+  createdAt    DateTime @default(now())
+  read         Boolean @default(false)
+}
+
+enum SubmissionStatus {
+  NEW           // Nuevo
+  CONTACTED     // Contactado
+  QUALIFIED     // Calificado
+  PROPOSAL      // Propuesta enviada
+  NEGOTIATION   // En negociación
+  WON           // Ganado
+  LOST          // Perdido
+  ON_HOLD       // En pausa
+  SPAM          // Basura
+}
+
+// 10. Offices
+model Office {
+  id        String @id @default(cuid())
+  code      String // BUE, MAD, etc.
+  address   String
+  email     String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 11. Footer Settings
+model FooterSettings {
+  id            String @id @default(cuid())
+  copyrightText String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  socialLinks   SocialLink[]
+}
+
+model SocialLink {
+  id        String @id @default(cuid())
+  name      String // LinkedIn, Instagram, etc.
+  url       String
+  icon      String // SVG or icon name
+  order     Int
+  footerId  String
+  footer    FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 12. Site Settings (SEO & General Configuration)
+model SiteSettings {
+  id                  String @id @default(cuid())
+  // SEO Settings
+  siteName            String @default("RotomLabs")
+  siteTitle           String @default("RotomLabs — Digital Backbone")
+  siteDescription     String @default("RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.")
+  siteKeywords        String? // Comma separated keywords
+  ogImage             String? // Default Open Graph image (1200x630)
+  twitterHandle       String @default("@rotom_labs")
+  
+  // Google Services
+  googleAnalyticsId   String? // GA4 ID
+  googleSiteVerification String? // Google Search Console verification
+  googleTagManagerId  String? // GTM ID
+  
+  // Social Media
+  facebookAppId       String?
+  linkedinUrl         String @default("https://linkedin.com/company/rotomlabs")
+  instagramUrl        String @default("https://instagram.com/rotom_labs")
+  
+  // Technical SEO
+  canonicalUrl        String @default("https://rotom-labs.com")
+  locale              String @default("en_US")
+  language            String @default("en")
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+// 13. Services Section (Our Services)
+model ServicesSection {
+  id          String @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       ServiceItem[]
+}
+
+model ServiceItem {
+  id         String  @id @default(cuid())
+  title      String
+  description String
+  mockupUrl  String   // URL de imagen/mockup mostrado en la columna izquierda
+  order      Int      @default(0)
+  sectionId  String
+  section    ServicesSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+

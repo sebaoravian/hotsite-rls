@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --foreground: #111111;
+  --background: #ffffff;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* Services slider animations */
+@keyframes services-enter-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes services-enter-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-enter-right { animation: services-enter-right 300ms ease-out; }
+.animate-enter-left { animation: services-enter-left 300ms ease-out; }
+
+/* Marquee animation for Clients slider (global to avoid styled-jsx issues) */
+.clients-animate-scroll {
+  width: max-content;
+  animation: clients-marquee 30s linear infinite;
+}
+
+@keyframes clients-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.hover-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background: var(--foreground);
+  transition: width 0.25s ease;
+}
+
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

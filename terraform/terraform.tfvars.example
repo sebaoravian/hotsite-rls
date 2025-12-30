@@ -1,0 +1,76 @@
+# ==========================================
+# Terraform Variables - Production Example
+# ==========================================
+# Copiar este archivo a terraform.tfvars y personalizar
+# NUNCA commitear terraform.tfvars con credenciales reales
+# ==========================================
+
+# ==========================================
+# AWS Configuration
+# ==========================================
+
+aws_region  = "us-east-1"  # N. Virginia (más económico)
+environment = "production"
+project_name = "rls"  # RLS = RotomLabs Site
+
+# ==========================================
+# Database Configuration
+# ==========================================
+
+db_name     = "rotomdb"
+db_username = "rotomadmin"
+db_password = "CHANGE_THIS_TO_A_STRONG_PASSWORD_123!"  # ⚠️ CAMBIAR
+
+# Instance sizing (ajustar según necesidades)
+db_instance_class       = "db.t3.micro"      # Free tier: $0 primer año, ~$15/mes después
+# db_instance_class     = "db.t4g.micro"     # Más económico con ARM (~$12/mes)
+# db_instance_class     = "db.t4g.small"     # Para más tráfico (~$24/mes)
+
+db_allocated_storage     = 20  # GB - Free tier hasta 20GB
+db_max_allocated_storage = 50  # GB - Autoscaling máximo
+
+# ==========================================
+# GitHub & Deployment
+# ==========================================
+
+github_repository = "https://github.com/YOUR_USERNAME/hotsite"  # ⚠️ CAMBIAR
+git_branch        = "main"
+
+# ==========================================
+# Custom Domain (obligatorio para producción)
+# ==========================================
+
+# Dominio personalizado con www
+domain_name = "www.rotom-labs.com"
+
+# Redirigir rotom-labs.com -> www.rotom-labs.com
+redirect_to_www = true
+
+# Para desarrollo/staging, dejar vacío:
+# domain_name = ""
+
+# ==========================================
+# Application Secrets
+# ==========================================
+
+site_password  = "CHANGE_THIS_TO_YOUR_ADMIN_PASSWORD"  # ⚠️ CAMBIAR
+session_secret = "CHANGE_THIS_TO_A_RANDOM_32_CHAR_STRING"  # ⚠️ CAMBIAR
+
+# Para generar session_secret seguro:
+# openssl rand -base64 32
+
+# ==========================================
+# Monitoring & Cost Control
+# ==========================================
+
+enable_monitoring = false  # true para habilitar CloudWatch alarms (costo adicional)
+
+# ==========================================
+# Additional Tags (opcional)
+# ==========================================
+
+additional_tags = {
+  Team        = "Engineering"
+  CostCenter  = "Marketing"
+  Terraform   = "true"
+}
