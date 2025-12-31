@@ -3,7 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - npm install
         - echo "DATABASE_URL=$DATABASE_URL" > .env
         - npx prisma generate
         - npx prisma db push --skip-generate --accept-data-loss || true
