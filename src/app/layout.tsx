@@ -7,6 +7,10 @@ import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Force all pages to be dynamic (no static generation)
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+
 // Valores por defecto para SEO - no requieren BD
 function getDefaultSettings() {
   return {
