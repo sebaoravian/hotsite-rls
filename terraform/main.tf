@@ -254,6 +254,7 @@ resource "aws_amplify_app" "main" {
                 - npm install
                 - echo "DATABASE_URL=$DATABASE_URL" > .env
                 - echo "SITE_PASSWORD=$SITE_PASSWORD" >> .env
+                - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
                 - echo "SESSION_SECRET=$SESSION_SECRET" >> .env
                 - npx prisma generate
             build:
@@ -277,6 +278,7 @@ resource "aws_amplify_app" "main" {
     NEXT_PUBLIC_GA_ID   = "G-BR7ZT313G6"
     DATABASE_URL        = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.postgres.endpoint}/${var.db_name}"
     SITE_PASSWORD       = var.site_password
+    ADMIN_PASSWORD      = var.site_password
     SESSION_SECRET      = var.session_secret
   }
 

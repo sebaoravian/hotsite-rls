@@ -5,6 +5,10 @@ frontend:
       commands:
         - rm -rf node_modules package-lock.json
         - npm install
+        - echo "DATABASE_URL=$DATABASE_URL" > .env
+        - echo "SITE_PASSWORD=$SITE_PASSWORD" >> .env
+        - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+        - echo "SESSION_SECRET=$SESSION_SECRET" >> .env
         - npx prisma generate
     build:
       commands:
