@@ -4,53 +4,30 @@ import "./globals.css";
 import Script from "next/script";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
-import { prisma } from "@/lib/prisma";
 
 const inter = Inter({ subsets: ["latin"] });
 
-async function getSettings() {
-  try {
-    let settings = await prisma.siteSettings.findFirst();
-    
-    if (!settings) {
-      // Crear settings por defecto si no existen
-      settings = await prisma.siteSettings.create({
-        data: {
-          siteName: "RotomLabs",
-          siteTitle: "RotomLabs — Digital Backbone",
-          siteDescription: "RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.",
-          twitterHandle: "@rotom_labs",
-          linkedinUrl: "https://linkedin.com/company/rotomlabs",
-          instagramUrl: "https://instagram.com/rotom_labs",
-          canonicalUrl: "https://rotom-labs.com",
-          locale: "en_US",
-          language: "en",
-        },
-      });
-    }
-    
-    return settings;
-  } catch (error) {
-    console.error('Error loading settings:', error);
-    // Retornar valores por defecto si hay error
-    return {
-      siteName: "RotomLabs",
-      siteTitle: "RotomLabs — Digital Backbone",
-      siteDescription: "RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.",
-      siteKeywords: null,
-      ogImage: null,
-      twitterHandle: "@rotom_labs",
-      googleAnalyticsId: null,
-      googleSiteVerification: null,
-      canonicalUrl: "https://rotom-labs.com",
-      locale: "en_US",
-      language: "en",
-    };
-  }
+// Valores por defecto para SEO - no requieren BD
+function getDefaultSettings() {
+  return {
+    siteName: "RotomLabs",
+    siteTitle: "RotomLabs — Digital Backbone",
+    siteDescription: "RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.",
+    siteKeywords: null,
+    ogImage: null,
+    twitterHandle: "@rotom_labs",
+    googleAnalyticsId: process.env.NEXT_PUBLIC_GA_ID || null,
+    googleSiteVerification: null,
+    canonicalUrl: "https://rotom-labs.com",
+    locale: "en_US",
+    language: "en",
+    linkedinUrl: "https://linkedin.com/company/rotomlabs",
+    instagramUrl: "https://instagram.com/rotom_labs",
+  };
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
+export function generateMetadata(): Metadata {
+  const settings = getDefaultSettings();
   
   // Procesar keywords
   const keywordsArray = settings.siteKeywords 
@@ -118,12 +95,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSettings();
+  const settings = getDefaultSettings();
   const GA_ID = settings.googleAnalyticsId || process.env.NEXT_PUBLIC_GA_ID;
   const GTM_ID = settings.googleTagManagerId;
   

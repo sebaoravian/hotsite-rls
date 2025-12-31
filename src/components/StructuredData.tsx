@@ -1,34 +1,21 @@
 import Script from 'next/script'
-import { prisma } from '@/lib/prisma'
 
 interface OrganizationSchemaProps {
   url?: string
 }
 
-async function getSettings() {
-  try {
-    const settings = await prisma.siteSettings.findFirst()
-    return settings || {
-      siteName: "RotomLabs",
-      canonicalUrl: "https://rotom-labs.com",
-      siteDescription: "RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.",
-      linkedinUrl: "https://linkedin.com/company/rotomlabs",
-      instagramUrl: "https://instagram.com/rotom_labs",
-    }
-  } catch (error) {
-    console.error('Error loading settings for schema:', error)
-    return {
-      siteName: "RotomLabs",
-      canonicalUrl: "https://rotom-labs.com",
-      siteDescription: "RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.",
-      linkedinUrl: "https://linkedin.com/company/rotomlabs",
-      instagramUrl: "https://instagram.com/rotom_labs",
-    }
+function getDefaultSettings() {
+  return {
+    siteName: "RotomLabs",
+    canonicalUrl: "https://rotom-labs.com",
+    siteDescription: "RotomLabs builds the digital backbone behind global companies: cloud architecture, data, AI, mobile platforms and secure integrations.",
+    linkedinUrl: "https://linkedin.com/company/rotomlabs",
+    instagramUrl: "https://instagram.com/rotom_labs",
   }
 }
 
-export async function OrganizationSchema({ url }: OrganizationSchemaProps = {}) {
-  const settings = await getSettings()
+export function OrganizationSchema({ url }: OrganizationSchemaProps = {}) {
+  const settings = getDefaultSettings()
   const baseUrl = url || settings.canonicalUrl
   
   const schema = {
@@ -80,8 +67,8 @@ interface WebsiteSchemaProps {
   url?: string
 }
 
-export async function WebsiteSchema({ url }: WebsiteSchemaProps = {}) {
-  const settings = await getSettings()
+export function WebsiteSchema({ url }: WebsiteSchemaProps = {}) {
+  const settings = getDefaultSettings()
   const baseUrl = url || settings.canonicalUrl
   
   const schema = {
