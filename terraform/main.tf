@@ -238,8 +238,10 @@ resource "aws_secretsmanager_secret_version" "db_credentials" {
 # ==========================================
 
 resource "aws_amplify_app" "main" {
-  name       = var.project_name
-  # repository se conectará manualmente después del apply
+  name         = var.project_name
+  repository   = var.github_repository
+  access_token = var.github_token
+  platform     = "WEB_COMPUTE"  # Necesario para Next.js SSR
 
   # Build settings para Next.js
   build_spec = <<-EOT
@@ -249,7 +251,11 @@ resource "aws_amplify_app" "main" {
           phases:
             preBuild:
               commands:
-                - npm ci
+                - npm install
+                - echo "DATABASE_URL=$DATABASE_URL" > .env
+                - echo "SITE_PASSWORD=$SITE_PASSWORD" >> .env
+                - echo "SESSION_SECRET=$SESSION_SECRET" >> .env
+                - npx prisma generate
             build:
               commands:
                 - npm run build
@@ -266,11 +272,12 @@ resource "aws_amplify_app" "main" {
 
   # Variables de entorno
   environment_variables = {
-    NODE_VERSION      = "18"
-    NEXT_PUBLIC_URL   = "https://${var.domain_name}"
-    DATABASE_URL      = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.postgres.endpoint}/${var.db_name}"
-    SITE_PASSWORD     = var.site_password
-    SESSION_SECRET    = var.session_secret
+    NODE_VERSION        = "18"
+    NEXT_PUBLIC_URL     = "https://${var.domain_name}"
+    NEXT_PUBLIC_GA_ID   = "G-BR7ZT313G6"
+    DATABASE_URL        = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.postgres.endpoint}/${var.db_name}"
+    SITE_PASSWORD       = var.site_password
+    SESSION_SECRET      = var.session_secret
   }
 
   # Custom rules para Next.js
@@ -328,13 +335,7 @@ resource "aws_amplify_domain_association" "main" {
   # Configuración para www.rotom-labs.com (principal)
   sub_domain {
     branch_name = aws_amplify_branch.main.branch_name
-    prefix      = ""  # www.rotom-labs.com
-  }
-
-  # Configuración para rotom-labs.com (redirige a www)
-  sub_domain {
-    branch_name = aws_amplify_branch.main.branch_name
-    prefix      = ""  # Root sin prefijo (apex domain)
+    prefix      = ""  # www.rotom-labs.com (ya que domain_name es www.rotom-labs.com)
   }
 
   # SSL certificate is automatically provided by Amplify
@@ -343,6 +344,20 @@ resource "aws_amplify_domain_association" "main" {
   # - TLS 1.2+
   # - Renovación automática
   
+  wait_for_verification = true
+}
+
+# Asociación para el dominio apex (rotom-labs.com)
+resource "aws_amplify_domain_association" "apex" {
+  count       = var.domain_name != "" && var.redirect_to_www ? 1 : 0
+  app_id      = aws_amplify_app.main.id
+  domain_name = replace(var.domain_name, "www.", "")  # rotom-labs.com
+
+  sub_domain {
+    branch_name = aws_amplify_branch.main.branch_name
+    prefix      = ""
+  }
+
   wait_for_verification = true
 }
 
